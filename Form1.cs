@@ -7,7 +7,7 @@ namespace Laba1
 
     public partial class Form1 : Form
     { 
-        public List<string> сhars = new List<string> {"<=",">=", "&", "&&", "*", ";", "-", "+", "/", "{", "}", "(", ")", "=", "==", "<", ">", ",", "\n"};
+        public List<string> сhars = new List<string> {"<=",">=", "&", "&&", "*", ";", "-", "+", "/", "{", "}", "(", ")", "=", "==", "<", ">", ","};
         public List<string> keyWord = new List<string> { "if", "then", "else", "end"};
         public List<String> variables = new List<string>();
         public List<String> literals = new List<string>();
@@ -42,7 +42,7 @@ namespace Laba1
             string buffer = "";
             for(int i = 0; i < code.Length; i++)
             {
-                if (!((code[i] >= 48 && code[i] <= 62) || (code[i] >= 65 && code[i] <= 90) || (code[i] == 32) || (code[i] >= 97 && code[i] <= 122) || (code[i] >= 60 && code[i] <= 62) || (code[i] >= 40 && code[i] <= 47) || (code[i] == 44) || (code[i] == 46)))
+                if (!((code[i] >= 48 && code[i] <= 62) || (code[i] >= 65 && code[i] <= 90) || (code[i] == 32) || (code[i] >= 97 && code[i] <= 122) || (code[i] >= 60 && code[i] <= 62) || (code[i] >= 40 && code[i] <= 47) || (code[i] == 44) || (code[i] == 46) || code[i] == 10))
                 {
                     MessageBox.Show($"Ошибка компиляции в символе {code[i]}");
                     break;
