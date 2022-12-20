@@ -7,7 +7,7 @@ namespace Laba1
 
     public partial class Form1 : Form
     { 
-        public List<string> сhars = new List<string> {"<=",">=", "&", "&&", "*", ";", "-", "+", "/", "{", "}", "(", ")", "=", "==", "<", ">", ","};
+        public List<string> chars = new List<string> {"\n", "<=",">=", "&", "&&", "*", ";", "-", "+", "/", "{", "}", "(", ")", "=", "==", "<", ">", ","};
         public List<string> keyWord = new List<string> { "if", "then", "else", "end"};
         public List<String> variables = new List<string>();
         public List<String> literals = new List<string>();
@@ -24,7 +24,10 @@ namespace Laba1
       
         private void button1_Click(object sender, EventArgs e)
         {
-            
+            variables.Clear();
+            literals.Clear();
+            standartTable.Clear();
+
 
             dataGridView1.Rows.Clear();
             dataGridView1.Refresh();
@@ -54,9 +57,9 @@ namespace Laba1
                         addToList(buffer); //добавляем лексемы в список
                         buffer = ""; //очищаем буфер от лексемы
                     }
-                    else if (сhars.Contains(Convert.ToString(code[i]))) // если лексема относится к списку знаков
+                    else if (chars.Contains(Convert.ToString(code[i]))) // если лексема относится к списку знаков
                     {
-                        if (сhars.Contains(Convert.ToString(buffer) + Convert.ToString(code[i]))) // если в буфере есть символы знаков и любой другой символ
+                        if (chars.Contains(Convert.ToString(buffer) + Convert.ToString(code[i]))) // если в буфере есть символы знаков и любой другой символ
                         {
                             buffer += code[i]; //сложение к буферу
                         }
@@ -68,7 +71,7 @@ namespace Laba1
                     }
                     else
                     {
-                        if (сhars.Contains(Convert.ToString(buffer[0]))){//если первый элемент буфера относится к символу
+                        if (chars.Contains(Convert.ToString(buffer[0]))){//если первый элемент буфера относится к символу
                             addToList(buffer); // добавление лексемы в список
                             buffer = ""; //обнуление буфера
                         }
@@ -98,19 +101,19 @@ namespace Laba1
 
             SaveStandartTable();
 
-            variables.Clear();
-            literals.Clear();
+            //variables.Clear();
+            //literals.Clear();
+            SintaxeAnalyser analyser = new SintaxeAnalyser(chars, keyWord, variables, literals, standartTable);
+            analyser.checkEngine();
         }
 
-        /// <summary>
-        /// метод добавление лексемы в список лексем
-        /// </summary>
-        /// <param name="list"> список лексем </param>
+        
         public void PrintLeksem(ListWithDuplicates list)
         {
             foreach (KeyValuePair<string, string> listItem in list)
             {
                 dataGridView1.Rows.Add(listItem.Key, listItem.Value);
+
             }
         }
 
@@ -161,7 +164,7 @@ namespace Laba1
             else
             {
                 
-                if (сhars.Contains(Convert.ToString(lexem)))
+                if (chars.Contains(Convert.ToString(lexem)))
                 {
                     var list = new ListWithDuplicates();
                     list.Add(lexem, "R");
@@ -196,8 +199,10 @@ namespace Laba1
         private void Form1_Load(object sender, EventArgs e)
         {
             PrintWord(dataGridView2, keyWord);
-            PrintWord(dataGridView3, сhars);
+            PrintWord(dataGridView3, chars);
         }
+
+
 
     }
 }
