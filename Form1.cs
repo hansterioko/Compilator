@@ -7,7 +7,7 @@ namespace Laba1
 
     public partial class Form1 : Form
     { 
-        public List<string> chars = new List<string> {"\n", "<=",">=", "&", "&&", "*", ";", "-", "+", "/", "{", "}", "(", ")", "=", "==", "<", ">", ","};
+        public List<string> chars = new List<string> {Convert.ToChar(10).ToString(), "<=",">=", "&", "&&", "*", ";", "-", "+", "/", "{", "}", "(", ")", "=", "==", "<", ">", ","};
         public List<string> keyWord = new List<string> { "if", "then", "else", "end"};
         public List<String> variables = new List<string>();
         public List<String> literals = new List<string>();
@@ -40,7 +40,7 @@ namespace Laba1
             dataGridView6.Refresh();
 
 
-            string code = rText.Text.TrimStart().TrimEnd();
+            string code = rText.Text.Trim();
           
             string buffer = "";
             for(int i = 0; i < code.Length; i++)
@@ -50,9 +50,17 @@ namespace Laba1
                     MessageBox.Show($"Ошибка компиляции в символе {code[i]}");
                     break;
                 }
+                if (code[i] == 10)
+                {
+                    buffer = "";
+                    addToList(code[i].ToString());
+                    continue;
+                }
+               
+
                 if (buffer != "")
                 {
-                    if (Convert.ToString(code[i]).Trim().Equals("")) //если нет пробелов
+                    if (Convert.ToString(code[i]).Trim().Equals("") && code[i] != 10) //если нет пробелов
                     {
                         addToList(buffer); //добавляем лексемы в список
                         buffer = ""; //очищаем буфер от лексемы
@@ -181,6 +189,8 @@ namespace Laba1
                     }
                     else
                     {
+                        if (lexem[0] == 32)
+                            return;
                         var list = new ListWithDuplicates();
                         list.Add(lexem, "I");
                         PrintLeksem(list);

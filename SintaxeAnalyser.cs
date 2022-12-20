@@ -42,17 +42,20 @@ namespace Laba1
 
             sdvig();
 
-            while (!breakWhile)
+            
+            while (!isError)
             {
+                //MessageBox.Show("Стадия  " + state.ToString() + "   Стек   " + stack.Peek());
                 switch (state)
                 {
                     case 0:
-                        if (stack.Peek() == "<программа>")
-                        {
-                            isError = false;
-                            breakWhile = true;
-                            continue;
-                        }else
+                        //if (stack.Peek() == "<программа>")
+                        //{
+                        //    isError = false;
+                        //    breakWhile = true;
+                        //    continue;
+                        //}else
+                        
                         if (stack.Peek() == "<список_действий>")
                         {
                             
@@ -63,7 +66,8 @@ namespace Laba1
                         if (stack.Peek() == "<действие>")
                         {
                             goState(2);
-                        }
+
+                        }else
                         if (stack.Peek() == "<присваивание>")
                         {
                             goState(5);
@@ -92,9 +96,10 @@ namespace Laba1
                             break;
 
                     case 1:
+                        //MessageBox.Show("Что");
                         if(step + 1 > standartTable.Count)
                         {
-                            isError = false;
+                            isError = true;
                             breakWhile = true;
                             continue;
                         }
@@ -114,6 +119,7 @@ namespace Laba1
                     case 2:
                         if (stack.Peek() == "<действие>")
                         {
+                            
                             svertka(1, "<список_действий>");
                         }
                         else
@@ -131,6 +137,12 @@ namespace Laba1
                         else
                         if (stack.Peek() == "\n")
                         {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: if or variable of переход на другую строку");
+                                continue;
+                            }
                             sdvig();
                         }
                         
@@ -144,9 +156,9 @@ namespace Laba1
                             goState(6);
                         }
                         else
-                        if (stack.Peek() == "id")
+                        if (variables.Contains(stack.Peek()))
                         {
-                            goState(8);
+                            goState(7);
                         }
                         else
                         if (stack.Peek() == "if")
@@ -186,13 +198,21 @@ namespace Laba1
                         break;
 
                     case 7:
-                        if (stack.Peek() == "id")
+                        if (variables.Contains(stack.Peek()))
                         {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: =");
+                                continue;
+                            }
                             sdvig();
                         }
+
                         if (stack.Peek() == "=")
                         {
                             goState(8);
+                            
                         }
                         else
                         {
@@ -205,12 +225,19 @@ namespace Laba1
                     case 8:
                         if (stack.Peek() == "=")
                         {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: Переменная или число");
+                                continue;
+                            }
                             sdvig();
                         }
                         
                         if (stack.Peek() == "<операнд>")
                         {
                             goState(11);
+
                         }
                         else
                         if (variables.Contains(stack.Peek()))
@@ -257,6 +284,12 @@ namespace Laba1
                     case 11:
                         if (stack.Peek() == "<операнд>")
                         {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: ; or знак");
+                                continue;
+                            }
                             sdvig();
                         }
                         
@@ -305,7 +338,7 @@ namespace Laba1
                     case 12:
                         if (stack.Peek() == ";")
                         {
-                            svertka(4, "<присваивание>");
+                            svertka(5, "<присваивание>");
                         }
                         else
                         {
@@ -377,6 +410,12 @@ namespace Laba1
                     case 18:
                         if (stack.Peek() == "<знак>")
                         {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: переменная или число");
+                                continue;
+                            }
                             sdvig();
                         }
                         
@@ -405,6 +444,12 @@ namespace Laba1
                     case 19:
                         if (stack.Peek() == "<операнд>")
                         {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: \";\"");
+                                continue;
+                            }
                             sdvig();
                         }
 
@@ -424,8 +469,11 @@ namespace Laba1
                         if (stack.Peek() == "if")           // Втавка заглушки !!!!!!!!
                         {
                             //sdvig();
-                            plug();// Заглушка
-
+                            isError = plug();// Заглушка
+                            if (isError)
+                                continue;
+                            stack.Push("then");
+                            goState(23);
                             // временно из-за заглушки go
                         }
 
@@ -443,31 +491,43 @@ namespace Laba1
 
                     // Должен быть код вместо заглушки!!!!!
 
-                    case 22:
-                        if (stack.Peek() == "\n")
-                        {
-                            sdvig();
-                        }
+                    //case 22:
+                    //    if (stack.Peek() == "\n")
+                    //    {
+                    //        if (step + 1 > standartTable.Count)
+                    //        {
+                    //            isError = true;
+                    //            MessageBox.Show("Ожидалось: then");
+                    //            continue;
+                    //        }
+                    //        sdvig();
+                    //    }
 
-                        if (stack.Peek() == "then")
-                        {
-                            goState(23);
-                        }
-                        else
-                        {
-                            messengeShow("then");
-                            isError = true;
-                            continue;
-                        }
-                        break;
+                    //    if (stack.Peek() == "then")
+                    //    {
+                    //        goState(23);
+                    //    }
+                    //    else
+                    //    {
+                    //        messengeShow("then");
+                    //        isError = true;
+                    //        continue;
+                    //    }
+                    //    break;
 
                     case 23:
                         if (stack.Peek() == "then")
                         {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: переход на другую строку");
+                                continue;
+                            }
                             sdvig();
                         }
 
-                        if (stack.Peek() == "\n")
+                        if (stack.Peek().Equals(chars[0]))
                         {
                             goState(24);
                         }
@@ -480,18 +540,334 @@ namespace Laba1
                         break;
 
                     case 24:
-                        if (stack.Peek() == "\n")
+                        if (stack.Peek().Equals(chars[0]))
                         {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: if or variable");
+                                continue;
+                            }
                             sdvig();
                         }
 
-                        if (stack.Peek() == "then")
+                        if (stack.Peek() == "<список_действий>")
                         {
-                            goState(23);
+                            goState(26);
+                        }
+                        else
+                        if (stack.Peek() == "<действие>")
+                        {
+                            goState(2);
+                        }
+                        else
+                        if (stack.Peek() == "<присваивание>")
+                        {
+                            goState(5);
+                        }
+                        else
+                        if (stack.Peek() == "<условный_оператор>")
+                        {
+                            goState(6);
+                        }
+                        else
+                        if (variables.Contains(stack.Peek()))
+                        {
+                            goState(7);
+                        }
+                        else
+                        if (stack.Peek() == "if")
+                        {
+                            goState(20);
                         }
                         else
                         {
-                            messengeShow("then");
+                            messengeShow("переменная или if");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 26:
+                        if (stack.Peek() == "<список_действий>")
+                        {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: переход на другую строку");
+                                continue;
+                            }
+                            sdvig();
+                        }
+
+                        if (stack.Peek().Equals(chars[0]))
+                        {
+                            goState(27);
+                        }
+                        else
+                        {
+                            messengeShow("перенос на друг. строку");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 27:
+                        if (stack.Peek().Equals(chars[0]))
+                        {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: end or else");
+                                continue;
+                            }
+                            sdvig();
+                        }
+
+                        if (stack.Peek() == "<действие>")
+                        {
+                            goState(4);
+                        }
+                        else
+                        if (stack.Peek() == "end")
+                        {
+                            goState(28);
+                        }
+                        else
+                        if (stack.Peek() == "else")
+                        {
+                            goState(29);
+                        }
+                        else
+                        {
+                            messengeShow("end or else");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 28:
+                        if (stack.Peek() == "end")
+                        {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: \";\"");
+                                continue;
+                            }
+                            sdvig();
+                        }
+
+                        if (stack.Peek() == ";")
+                        {
+                            goState(37);
+                        }
+                        else
+                        {
+                            messengeShow(";");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 30:
+                        if (stack.Peek() == "else")
+                        {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: переход на другую строку");
+                                continue;
+                            }
+                            sdvig();
+                        }
+
+                        if (stack.Peek().Equals(chars[0]))
+                        {
+                            goState(31);
+                        }
+                        else
+                        {
+                            messengeShow("переход на другую строку");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 31:
+                        if (stack.Peek().Equals(chars[0]))
+                        {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: variable or if");
+                                continue;
+                            }
+                            sdvig();
+                        }
+
+                        if (stack.Peek() == "<список_действий>")
+                        {
+                            goState(32);
+                        }
+                        else
+                        if (stack.Peek() == "<действие>")
+                        {
+                            goState(2);
+                        }
+                        else
+                        if (stack.Peek() == "<присваивание>")
+                        {
+                            goState(5);
+                        }
+                        else
+                        if (stack.Peek() == "<условный_оператор>")
+                        {
+                            goState(6);
+                        }
+                        else
+                        if (variables.Contains(stack.Peek()))
+                        {
+                            goState(7);
+                        }
+                        else
+                        if (stack.Peek() == "if")
+                        {
+                            goState(20);
+                        }
+                        else
+                        {
+                            messengeShow("variable or if");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 32:
+                        if (stack.Peek() == "<список_действий>")
+                        {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: переход на другую строку");
+                                continue;
+                            }
+                            sdvig();
+                        }
+
+                        if (stack.Peek().Equals(chars[0]))
+                        {
+                            goState(33);
+                        }
+                        else
+                        {
+                            messengeShow("переход на другую строку");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 33:
+                        if (stack.Peek().Equals(chars[0]))
+                        {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: end");
+                                continue;
+                            }
+                            sdvig();
+                        }
+
+                        if (stack.Peek() == "end")
+                        {
+                            goState(34);
+                        }
+                        else
+                        if (stack.Peek() == "<действие>")
+                        {
+                            goState(4);
+                        }
+                        else
+                        {
+                            messengeShow("end");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 34:
+                        if (stack.Peek() == "end")
+                        {
+                            if (step + 1 > standartTable.Count)
+                            {
+                                isError = true;
+                                MessageBox.Show("Ожидалось: ;");
+                                continue;
+                            }
+                            sdvig();
+                        }
+
+                        
+                        if (stack.Peek() == ";")
+                        {
+                            goState(38);
+                        }
+                        else
+                        {
+                            messengeShow(";");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 35:
+                        if (stack.Peek() == ";")
+                        {
+                            svertka(9, "<присваивание>");
+                        }
+                        else
+                        {
+                            messengeShow(";");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 37:
+                        if (stack.Peek() == ";")
+                        {
+                            svertka(9, "<условный_оператор>");
+                        }
+                        else
+                        {
+                            messengeShow(";");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 38:
+                        if (stack.Peek() == ";")
+                        {
+                            svertka(13, "<условный_оператор>");
+                        }
+                        else
+                        {
+                            messengeShow(";");
+                            isError = true;
+                            continue;
+                        }
+                        break;
+
+                    case 39:
+                        if (stack.Peek() == "<действие>")
+                        {
+                            svertka(3, "<список_действий>");
+                        }
+                        else
+                        {
+                            messengeShow("");
                             isError = true;
                             continue;
                         }
@@ -499,26 +875,33 @@ namespace Laba1
                 }
 
             }
+            if (!isError)
+            {
+                MessageBox.Show("Без ошибок");
+            }
         }
 
         private void goState(int stateNum)
         {
             sortStack.Push(state);
+
             state = stateNum;
         }
 
         private void svertka(int num, String neterm)
         {
-            for (int i = 0; i < num; i++)
+           
+            for (int i = 0; i < num-1; i++)
             {
                 stack.Pop();
             }
             stack.Push(neterm);
-            for (int i = 0; i < num; i++)
+            for (int i = 0; i < num-1; i++)
             {
                 sortStack.Pop();
             }
             state = sortStack.Peek();
+
         }
         
         private void sdvig()
@@ -554,17 +937,27 @@ namespace Laba1
             MessageBox.Show("Встретилось: " + stack.Peek() + "  Ожидалось: " + expected); ;
         }
 
-        private void plug()
+        private bool plug()
         {
-            while (getVerhina(step) != "\n")
+            if (!(step + 1 > standartTable.Count))
             {
-                step++;
-                if (step > standartTable.Count)
+                do
                 {
-                    messengeShow("перенос строки после expr");
-                }
+                    if (step + 1 > standartTable.Count)
+                    {
+                        return true;
+                    }
+                    step++;
+                    
+                } while (getVerhina(step) == "then");
+                return false;
             }
-            
+            else
+            {
+                MessageBox.Show("Встретилась пустота, ожидалось: then");
+                return true;
+            }
+            return true;
         }
     }
 }
