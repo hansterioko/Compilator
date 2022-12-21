@@ -38,29 +38,23 @@ namespace Laba1
             bool isError = false;
             bool breakWhile = false;
             state = 0;
-            String element = getVerhina(0);
+            step = 1;
 
-            sdvig();
+            //sdvig();
+            stack.Push(getVerhina(0));
 
             
             while (!isError)
             {
-                //MessageBox.Show("Стадия  " + state.ToString() + "   Стек   " + stack.Peek());
+                MessageBox.Show("Стадия  " + state.ToString() + "   Стек   " + stack.Peek());
                 switch (state)
                 {
                     case 0:
-                        //if (stack.Peek() == "<программа>")
-                        //{
-                        //    isError = false;
-                        //    breakWhile = true;
-                        //    continue;
-                        //}else
+                        
                         
                         if (stack.Peek() == "<список_действий>")
-                        {
-                            
-                                goState(1);
-                            
+                        {               
+                            goState(1);
                         }
                         else
                         if (stack.Peek() == "<действие>")
@@ -96,16 +90,16 @@ namespace Laba1
                             break;
 
                     case 1:
-                        //MessageBox.Show("Что");
-                        if(step + 1 > standartTable.Count)
+                        if (step + 1 > standartTable.Count)
                         {
                             isError = true;
                             breakWhile = true;
                             continue;
                         }
                         else
-                        if (getVerhina(step+1) == "\n")
+                        if (getVerhina(step).Equals(Convert.ToChar(10).ToString()))
                         {
+                            sdvig();
                             goState(4);
                         }
                         else
@@ -130,12 +124,8 @@ namespace Laba1
                         break;
 
                     case 4:
-                        if (stack.Peek() == "<действие>")
-                        {
-                            goState(39);
-                        }
-                        else
-                        if (stack.Peek() == "\n")
+                        MessageBox.Show("А стек то в 4 " + stack.Peek());
+                        if (stack.Peek().Equals(Convert.ToChar(10).ToString()))
                         {
                             if (step + 1 > standartTable.Count)
                             {
@@ -145,7 +135,12 @@ namespace Laba1
                             }
                             sdvig();
                         }
-                        
+
+                        if (stack.Peek() == "<действие>")
+                        {
+                            goState(39);
+                        }
+                        else
                         if (stack.Peek() == "<присваивание>")
                         {
                             goState(5);
@@ -527,7 +522,7 @@ namespace Laba1
                             sdvig();
                         }
 
-                        if (stack.Peek().Equals(chars[0]))
+                        if (stack.Peek().Equals(Convert.ToChar(10).ToString()))
                         {
                             goState(24);
                         }
@@ -636,7 +631,7 @@ namespace Laba1
                         else
                         if (stack.Peek() == "else")
                         {
-                            goState(29);
+                            goState(30);
                         }
                         else
                         {
@@ -837,7 +832,7 @@ namespace Laba1
                     case 37:
                         if (stack.Peek() == ";")
                         {
-                            svertka(9, "<условный_оператор>");
+                            svertka(10, "<условный_оператор>");
                         }
                         else
                         {
@@ -850,7 +845,7 @@ namespace Laba1
                     case 38:
                         if (stack.Peek() == ";")
                         {
-                            svertka(13, "<условный_оператор>");
+                            svertka(17, "<условный_оператор>");
                         }
                         else
                         {
@@ -863,7 +858,7 @@ namespace Laba1
                     case 39:
                         if (stack.Peek() == "<действие>")
                         {
-                            svertka(3, "<список_действий>");
+                            svertka(4, "<список_действий>");
                         }
                         else
                         {
@@ -939,23 +934,13 @@ namespace Laba1
 
         private bool plug()
         {
-            if (!(step + 1 > standartTable.Count))
+            for (int i = step; i < standartTable.Count; i++)
             {
-                do
+                if (getVerhina(i).Equals("then"))
                 {
-                    if (step + 1 > standartTable.Count)
-                    {
-                        return true;
-                    }
-                    step++;
-                    
-                } while (getVerhina(step) == "then");
-                return false;
-            }
-            else
-            {
-                MessageBox.Show("Встретилась пустота, ожидалось: then");
-                return true;
+                    step = i+1;
+                    return false;
+                }
             }
             return true;
         }

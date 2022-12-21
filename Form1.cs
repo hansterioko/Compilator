@@ -40,7 +40,7 @@ namespace Laba1
             dataGridView6.Refresh();
 
 
-            string code = rText.Text.Trim();
+            string code = rText.Text;
           
             string buffer = "";
             for(int i = 0; i < code.Length; i++)
@@ -52,6 +52,8 @@ namespace Laba1
                 }
                 if (code[i] == 10)
                 {
+                    MessageBox.Show("kkkk");
+                    addToList(buffer);
                     buffer = "";
                     addToList(code[i].ToString());
                     continue;
@@ -60,7 +62,7 @@ namespace Laba1
 
                 if (buffer != "")
                 {
-                    if (Convert.ToString(code[i]).Trim().Equals("") && code[i] != 10) //если нет пробелов
+                    if (Convert.ToString(code[i]).Trim().Equals("")) //если нет пробелов
                     {
                         addToList(buffer); //добавляем лексемы в список
                         buffer = ""; //очищаем буфер от лексемы
