@@ -7,7 +7,7 @@ namespace Laba1
 
     public partial class Form1 : Form
     { 
-        public List<string> chars = new List<string> {Convert.ToChar(10).ToString(), "<=",">=", "&", "&&", "*", ";", "-", "+", "/", "{", "}", "(", ")", "=", "==", "<", ">", ","};
+        public List<string> chars = new List<string> { Convert.ToChar(10).ToString(), "*", ";", "-", "+", "/", "(", ")", "=", "==", "<", ">", ",", "!=", "&", "|", "^" };
         public List<string> keyWord = new List<string> { "if", "then", "else", "end"};
         public List<String> variables = new List<string>();
         public List<String> literals = new List<string>();
@@ -17,7 +17,6 @@ namespace Laba1
         public Form1()
         {
             InitializeComponent();
-            
         }
 
         
@@ -40,81 +39,127 @@ namespace Laba1
             dataGridView6.Refresh();
 
 
-            string code = rText.Text;
+            string code = rText.Text.TrimStart();
           
             string buffer = "";
-            for(int i = 0; i < code.Length; i++)
+            if (code.Length != 0)
             {
-                if (!((code[i] >= 48 && code[i] <= 62) || (code[i] >= 65 && code[i] <= 90) || (code[i] == 32) || (code[i] >= 97 && code[i] <= 122) || (code[i] >= 60 && code[i] <= 62) || (code[i] >= 40 && code[i] <= 47) || (code[i] == 44) || (code[i] == 46) || code[i] == 10))
+                for (int i = 0; i < code.Length; i++)
                 {
-                    MessageBox.Show($"Ошибка компиляции в символе {code[i]}");
-                    break;
-                }
-                if (code[i] == 10)
-                {
-                    MessageBox.Show("kkkk");
-                    addToList(buffer);
-                    buffer = "";
-                    addToList(code[i].ToString());
-                    continue;
-                }
-               
-
-                if (buffer != "")
-                {
-                    if (Convert.ToString(code[i]).Trim().Equals("")) //если нет пробелов
+                    if (!((code[i] >= 48 && code[i] <= 62) || (code[i] >= 65 && code[i] <= 90) || (code[i] == 32) || (code[i] == 94) || (code[i] == 33) || (code[i] >= 97 && code[i] <= 122) || (code[i] >= 60 && code[i] <= 62) || (code[i] >= 40 && code[i] <= 47) || (code[i] == 44) || (code[i] == 46) || code[i] == 10))
                     {
-                        addToList(buffer); //добавляем лексемы в список
-                        buffer = ""; //очищаем буфер от лексемы
+                        MessageBox.Show($"Ошибка компиляции в символе {code[i]}");
+                        break;
                     }
-                    else if (chars.Contains(Convert.ToString(code[i]))) // если лексема относится к списку знаков
+
+                    //MessageBox.Show(code[i].ToString());
+
+                    if (code[i] == 10)
                     {
-                        if (chars.Contains(Convert.ToString(buffer) + Convert.ToString(code[i]))) // если в буфере есть символы знаков и любой другой символ
+                        if (code[i - 1] == 10)
                         {
-                            buffer += code[i]; //сложение к буферу
+                            continue;
+                        }
+                        addToList(buffer);
+                        buffer = "";
+                        addToList(code[i].ToString());
+                        continue;
+                    }
+
+                    //if (code[i] == 32)
+                    //{
+                    //    if(code[i-1] == 32)
+                    //    {
+                    //        continue;
+                    //    }
+                    //    if (i + 1 > code.Length)
+                    //    {
+                    //        addToList(buffer);
+                    //        buffer = "";
+                    //        continue;
+                    //    }
+                    //}
+                    if ((code[i].Equals('!')) && (code.Length >= i+1) && (code[i + 1].Equals('=')))
+                    {
+                        addToList(buffer);
+                        buffer = "";
+                        buffer += code[i];
+                        continue;
+                    }
+                    if ((code[i].Equals('=')) && (i >= 0) && (code[i - 1].Equals('!')))
+                    {
+                        buffer += code[i];
+                        addToList(buffer);
+                        buffer = "";
+                        continue;
+                    }
+
+                    if (buffer != "")
+                    {
+                        if (Convert.ToString(code[i]).Trim().Equals("")) //если нет пробелов
+                        {
+                            addToList(buffer); //добавляем лексемы в список
+                            buffer = ""; //очищаем буфер от лексемы
+                        }
+                        else if (chars.Contains(Convert.ToString(code[i]))) // если лексема относится к списку знаков
+                        {
+                            if (chars.Contains(Convert.ToString(buffer) + Convert.ToString(code[i]))) // если в буфере есть символы знаков и любой другой символ
+                            {
+                                buffer += code[i]; //сложение к буферу
+                            }
+                            else
+                            {
+                                addToList(buffer); // добавление лексемы в список
+                                buffer = Convert.ToString(code[i]); // буфер становится равным символу
+                            }
                         }
                         else
                         {
-                            addToList(buffer); // добавление лексемы в список
-                            buffer = Convert.ToString(code[i]); // буфер становится равным символу
+                            if (chars.Contains(Convert.ToString(buffer[0])))
+                            {//если первый элемент буфера относится к символу
+                                addToList(buffer); // добавление лексемы в список
+                                buffer = ""; //обнуление буфера
+                            }
+                            buffer += code[i];// сложение элементов к буферу
                         }
                     }
                     else
                     {
-                        if (chars.Contains(Convert.ToString(buffer[0]))){//если первый элемент буфера относится к символу
-                            addToList(buffer); // добавление лексемы в список
-                            buffer = ""; //обнуление буфера
-                        }
                         buffer += code[i];// сложение элементов к буферу
                     }
-                }
-                else
-                {
-                    buffer += code[i];// сложение элементов к буферу
+
+                    if (i == code.Length - 1)
+                    {
+                        addToList(buffer);
+                    }
+
                 }
 
-                if (i == code.Length - 1)
-                {
-                    addToList(buffer);
-                }
 
+
+                PrintWord(dataGridView4, literals);
+                PrintWord(dataGridView5, variables);
+                PrintLeksemWithCode("4", dataGridView4);
+                PrintLeksemWithCode("2", dataGridView2);
+                PrintLeksemWithCode("3", dataGridView3);
+               
+                PrintLeksemWithCode("5", dataGridView5);
+
+                SaveStandartTable();
+
+                //variables.Clear();
+                //literals.Clear();
+
+                //SintaxeAnalyser analyser = new SintaxeAnalyser(chars, keyWord, variables, literals, standartTable);
+                //analyser.checkEngine();
+
+                foreach (string item in literals)
+                {
+                    richTextBox1.Text += item + "               ";
+                }
             }
 
-
-
-            PrintWord(dataGridView4, literals);
-            PrintWord(dataGridView5, variables);
-            PrintLeksemWithCode("2", dataGridView2);
-            PrintLeksemWithCode("3", dataGridView3);
-            PrintLeksemWithCode("4", dataGridView4);
-            PrintLeksemWithCode("5", dataGridView5);
-
-            SaveStandartTable();
-
-            //variables.Clear();
-            //literals.Clear();
-            SintaxeAnalyser analyser = new SintaxeAnalyser(chars, keyWord, variables, literals, standartTable);
-            analyser.checkEngine();
+            
         }
 
         
@@ -160,6 +205,8 @@ namespace Laba1
 
         public void addToList(string lexem)
         {
+            if (keyWord.Contains(lexem.ToLower()))
+                lexem = lexem.ToLower();
 
             if (int.TryParse(lexem, out int numericValue)) //если число
             {
@@ -184,24 +231,37 @@ namespace Laba1
                 }
                 else
                 {
-                    if (lexem[0] >= 48 && lexem[0] <= 57)
+                    if (lexem.Length == 0)
                     {
-                        MessageBox.Show($"Ошибка в лексеме: {lexem}", "Вывод лексем", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                         return;
                     }
                     else
                     {
-                        if (lexem[0] == 32)
+                        if (lexem[0] >= 48 && lexem[0] <= 57)
+                        {
+                            MessageBox.Show($"Ошибка в лексеме: {lexem}", "Вывод лексем", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                             return;
-                        var list = new ListWithDuplicates();
-                        list.Add(lexem, "I");
-                        PrintLeksem(list);
+                        }
+                        else
+                        {
+                            if (lexem == " ")
+                            {
+                                return;
+                            }
 
-                        if (!variables.Contains(lexem) && !keyWord.Contains(lexem))
-                        variables.Add(lexem);
+                            lexem = lexem.Trim();
 
-                        dataGridView6.Rows.Add("", lexem);
+                            var list = new ListWithDuplicates();
+                            list.Add(lexem, "I");
+                            PrintLeksem(list);
+
+                            if (!variables.Contains(lexem) && !keyWord.Contains(lexem.ToLower()))
+                                variables.Add(lexem);
+
+                            dataGridView6.Rows.Add("", lexem);
+                        }
                     }
+                    
                 }
                 
             }

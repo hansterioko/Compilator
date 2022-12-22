@@ -11,7 +11,6 @@ namespace Laba1
     {
         int state = 0;
         int step = 0;
-        int lastIn = 0;
 
         List<string> sost = new List<string> { };
 
@@ -38,15 +37,15 @@ namespace Laba1
             bool isError = false;
             bool breakWhile = false;
             state = 0;
-            step = 1;
+            step = 0;
 
-            //sdvig();
-            stack.Push(getVerhina(0));
+            sdvig();
+            
 
             
             while (!isError)
             {
-                MessageBox.Show("Стадия  " + state.ToString() + "   Стек   " + stack.Peek());
+                //MessageBox.Show("Стадия  " + state.ToString() + "   Стек   " + stack.Peek());
                 switch (state)
                 {
                     case 0:
@@ -124,13 +123,19 @@ namespace Laba1
                         break;
 
                     case 4:
-                        MessageBox.Show("А стек то в 4 " + stack.Peek());
+                        if (step + 1 > standartTable.Count)     // если после /- ничё нет, то конец
+                        {
+                            isError = true;
+                            breakWhile = true;
+                            continue;
+                        }
+
                         if (stack.Peek().Equals(Convert.ToChar(10).ToString()))
                         {
                             if (step + 1 > standartTable.Count)
                             {
                                 isError = true;
-                                MessageBox.Show("Ожидалось: if or variable of переход на другую строку");
+                                MessageBox.Show("После переноса ожидалось: if or variable of переход на другую строку");
                                 continue;
                             }
                             sdvig();
@@ -146,7 +151,7 @@ namespace Laba1
                             goState(5);
                         }
                         else
-                        if (stack.Peek() == "<условный оператор>")
+                        if (stack.Peek() == "<условный_оператор>")
                         {
                             goState(6);
                         }
@@ -162,7 +167,7 @@ namespace Laba1
                         }
                         else
                         {
-                            messengeShow("if или id или переход на другую строку");
+                            messengeShow("if или variable или переход на другую строку");
                             isError = true;
                             continue;
                         }
@@ -198,7 +203,7 @@ namespace Laba1
                             if (step + 1 > standartTable.Count)
                             {
                                 isError = true;
-                                MessageBox.Show("Ожидалось: =");
+                                MessageBox.Show("После числа ожидалось: =");
                                 continue;
                             }
                             sdvig();
@@ -223,7 +228,7 @@ namespace Laba1
                             if (step + 1 > standartTable.Count)
                             {
                                 isError = true;
-                                MessageBox.Show("Ожидалось: Переменная или число");
+                                MessageBox.Show("После = ожидалось: Переменная или число");
                                 continue;
                             }
                             sdvig();
@@ -282,7 +287,8 @@ namespace Laba1
                             if (step + 1 > standartTable.Count)
                             {
                                 isError = true;
-                                MessageBox.Show("Ожидалось: ; or знак");
+                                stack.Pop();
+                                MessageBox.Show("После " + stack.Peek() + " ожидалось: ; or знак");
                                 continue;
                             }
                             sdvig();
@@ -333,7 +339,7 @@ namespace Laba1
                     case 12:
                         if (stack.Peek() == ";")
                         {
-                            svertka(5, "<присваивание>");
+                            svertka(4, "<присваивание>");
                         }
                         else
                         {
@@ -466,7 +472,10 @@ namespace Laba1
                             //sdvig();
                             isError = plug();// Заглушка
                             if (isError)
+                            {
+                                MessageBox.Show("then не нашлось");
                                 continue;
+                            }
                             stack.Push("then");
                             goState(23);
                             // временно из-за заглушки go
@@ -619,9 +628,20 @@ namespace Laba1
                             sdvig();
                         }
 
-                        if (stack.Peek() == "<действие>")
+                        
+                        if (stack.Peek() == "<условный_оператор>")
                         {
-                            goState(4);
+                            goState(6);
+                        }
+                        else
+                        if (stack.Peek() == "<присваивание>")
+                        {
+                            goState(5);
+                        }
+                        else
+                       if (stack.Peek() == "<действие>")
+                        {
+                            goState(39);
                         }
                         else
                         if (stack.Peek() == "end")
@@ -632,6 +652,16 @@ namespace Laba1
                         if (stack.Peek() == "else")
                         {
                             goState(30);
+                        }
+                        else
+                        if (variables.Contains(stack.Peek()))
+                        {
+                            goState(7);
+                        }
+                        else
+                        if (stack.Peek() == "if")
+                        {
+                            goState(20);
                         }
                         else
                         {
@@ -781,7 +811,27 @@ namespace Laba1
                         else
                         if (stack.Peek() == "<действие>")
                         {
-                            goState(4);
+                            goState(39);
+                        }
+                        else
+                        if (stack.Peek() == "<присваивание>")
+                        {
+                            goState(5);
+                        }
+                        else
+                        if (stack.Peek() == "<условный_оператор>")
+                        {
+                            goState(6);
+                        }
+                        else
+                        if (variables.Contains(stack.Peek()))
+                        {
+                            goState(7);
+                        }
+                        else
+                        if (stack.Peek() == "if")
+                        {
+                            goState(20);
                         }
                         else
                         {
@@ -819,7 +869,7 @@ namespace Laba1
                     case 35:
                         if (stack.Peek() == ";")
                         {
-                            svertka(9, "<присваивание>");
+                            svertka(6, "<присваивание>");
                         }
                         else
                         {
@@ -832,7 +882,7 @@ namespace Laba1
                     case 37:
                         if (stack.Peek() == ";")
                         {
-                            svertka(10, "<условный_оператор>");
+                            svertka(7, "<условный_оператор>");
                         }
                         else
                         {
@@ -845,7 +895,7 @@ namespace Laba1
                     case 38:
                         if (stack.Peek() == ";")
                         {
-                            svertka(17, "<условный_оператор>");
+                            svertka(11, "<условный_оператор>");
                         }
                         else
                         {
@@ -858,7 +908,7 @@ namespace Laba1
                     case 39:
                         if (stack.Peek() == "<действие>")
                         {
-                            svertka(4, "<список_действий>");
+                            svertka(3, "<список_действий>");
                         }
                         else
                         {
@@ -878,24 +928,28 @@ namespace Laba1
 
         private void goState(int stateNum)
         {
-            sortStack.Push(state);
+           // MessageBox.Show("В Гостате приходит " + stateNum);
+          
+                sortStack.Push(state);
 
-            state = stateNum;
+                state = stateNum;
+            
         }
 
         private void svertka(int num, String neterm)
         {
            
-            for (int i = 0; i < num-1; i++)
+            for (int i = 0; i < num; i++)
             {
                 stack.Pop();
             }
             stack.Push(neterm);
-            for (int i = 0; i < num-1; i++)
+            for (int i = 0; i < num; i++)
             {
-                sortStack.Pop();
+               // MessageBox.Show("Удаляет " + sortStack.Peek());
+                state = sortStack.Pop();
             }
-            state = sortStack.Peek();
+            
 
         }
         
@@ -934,13 +988,19 @@ namespace Laba1
 
         private bool plug()
         {
+            bool findOK = false;
             for (int i = step; i < standartTable.Count; i++)
             {
                 if (getVerhina(i).Equals("then"))
                 {
+                    findOK = true;
                     step = i+1;
                     return false;
                 }
+            }
+            if (findOK)
+            {
+                MessageBox.Show("Не нашлось then");
             }
             return true;
         }
